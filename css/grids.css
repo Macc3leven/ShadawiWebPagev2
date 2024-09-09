@@ -1,0 +1,147 @@
+:root {
+    --border-color: #fff; /* Define a color variable */
+}
+
+.section-frame {
+    position: relative;
+    box-sizing: border-box;
+    width: calc(100vw - 32px);
+    height: calc(100vh - 16px);
+    /* width: 98vw;
+    height: 98vh; */
+    border: solid 1px var(--border-color);
+    border-radius: 16px;
+    text-align: center;
+    /* margin: 0 auto; */
+
+    /* Grid */
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr repeat(10, 1fr);
+}
+
+/* Sub containers in grid */
+.frame-header {
+    border-radius: 16px 16px 0px 0px;
+    border-bottom: solid 1px var(--border-color);
+    grid-column: 1 / -1;
+    /* Starts at the first column and stops at the second-to-last column */
+    grid-row: 1 / 2;
+    /* Or grid-row: -1; if it's the last row */
+}
+
+.frame-title {
+    border-radius: 16px 0px 0px 0px;
+    border-bottom: solid 1px var(--border-color);
+    grid-row: 1 / 5;
+    padding: 16px;
+    /* position: absolute; */
+    /* Or grid-row: -1; if it's the last row */
+    transition: all 3.5s ease-in-out; /* Add transition effect to the top property */
+}
+
+/* Class to slide the navbar upwards */
+.frame-title.active {
+    /* position: absolute; */
+    /* top: -50px; Slide up by adjusting the top value */
+}
+
+.frame-subtitle {
+    border-bottom: solid 1px var(--border-color);
+    grid-row: 2 / 5;
+    /* Or grid-row: -1; if it's the last row */
+}
+
+.frame-side-info {
+    border-left: solid 1px var(--border-color);
+    grid-column: -2 / -1;
+    grid-row: 1 / -2;
+}
+
+.frame-side-info-mobile {
+    display: none;
+    z-index: -1;
+    grid-column: 1 / -1;
+    grid-row: 1 / -2;
+}
+
+.frame-side-info,
+.frame-side-info-mobile {
+    position: relative;
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+
+.frame-side-info > img,
+.frame-side-info-mobile > img {
+    height: 100%;
+    position: absolute;
+    border-radius: 16px;
+    bottom: 0px;
+    left: 0px;
+}
+
+.info-top {
+    border-bottom: solid 1px var(--border-color);
+    grid-row: 5 / 8;
+    padding: 16px;
+}
+
+.info-bottom {
+    grid-row: 8 / 11;
+    padding: 16px;
+}
+
+.info-tall {
+    grid-row: 5 / 11;
+    padding: 16px;
+
+    /* background-color: aqua; */
+}
+
+.frame-footer {
+    border-radius: 0px 0px 16px 16px;
+    border-top: solid 1px var(--border-color);
+    grid-column: 1 / -1;
+    /* Starts at the first column and stops at the second-to-last column */
+    grid-row: -2 / -1;
+    /* Or grid-row: -1; if it's the last row */
+    padding: 16px;
+
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+.third {
+    grid-column: 1 / -2;
+}
+
+/* Mobile Layout */
+@media (max-width: 768px) {
+    .frame-title {
+        border-radius: 16px 16px 0px 0px;
+    }
+
+    .frame-side-info {
+        display: none;
+    }
+
+    .frame-side-info-mobile {
+        display: block;
+    }
+    .frame-side-info-mobile>img {
+        right: 0px;
+    }
+
+    .section-frame {
+        /* Grid for mobile */
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .third {
+        grid-column: 1 / -1;
+        /* Starts at the first column and stops at the second-to-last column */
+    }
+}
