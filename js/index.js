@@ -64,7 +64,7 @@ function handleSectionScroll() {
     if (i === currentSectionIndex && !isLastSection) {
       // Section is currently in view
       animateSection(section, progress); // handle animation based on progress
-    } // else section.style.transform = `translateY(0) scale(1)`;
+    } else section.style.transform = `translateY(0) scale(1)`;
   });
 }
 
@@ -91,15 +91,24 @@ window.addEventListener("scroll", () => {
 
 handleSectionScroll();
 
+
+
+
+// THREEJS GEM SCENE
+import * as CloudOgreScene from "./scenes/cloudOgreScene1.js";
+import * as GemScene from "./scenes/gemScene.js";
+import * as StarScene from "./scenes/gemScene.js";
+
+GemScene.initGems("current_canvas");
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "f" || event.key === "F") {
     console.log('The "F" key was pressed.');
-    // test runtime code
+    
+    GemScene.clearScene()
 
-    const frames = document.querySelectorAll(".frame-title");
-    // window.alert("frames: "+frames.length);
-    frames.forEach(f=>{
-        f.classList.add("active");
-    })
+
+
+
   }
 });
