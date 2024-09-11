@@ -60,11 +60,11 @@ function handleSectionScroll() {
     const rect = section.getBoundingClientRect();
     const relativePosition = rect.top / viewportHeight; // relative position in the viewport
     const progress = Math.abs(currentSectionIndex - scrollProgress);
-
-    if (i === currentSectionIndex) {
+    const isLastSection = currentSectionIndex == sections.length - 1;
+    if (i === currentSectionIndex && !isLastSection) {
       // Section is currently in view
       animateSection(section, progress); // handle animation based on progress
-    } else section.style.transform = `translateY(0) scale(1)`;
+    } // else section.style.transform = `translateY(0) scale(1)`;
   });
 }
 
