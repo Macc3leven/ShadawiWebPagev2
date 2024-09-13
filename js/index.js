@@ -37,13 +37,14 @@ function broadcastSectionChange(previousIndex, newIndex) {
     detail: { newIndex, previousIndex },
   });
 
-  console.log("CHANGE bROADcASTED");
+  console.log(`CHANGE bROADcASTED ${previousIndex}->${newIndex}`);
   window.dispatchEvent(event);
 }
 
 function handleSectionScroll() {
-  const scrollY = window.scrollY;
-  const scrollProgress = scrollY / viewportHeight;
+  let scrollY = window.scrollY;
+  let scrollProgress = scrollY / viewportHeight;
+  console.log(scrollProgress)
   const newIndex = Math.floor(scrollProgress);
   if (currentSectionIndex != newIndex) {
     broadcastSectionChange(currentSectionIndex, newIndex);

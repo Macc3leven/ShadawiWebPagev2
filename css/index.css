@@ -1,12 +1,15 @@
 :root {
     --border-color: #fff; /* Define a color variable */
 }
-
+html{
+    scroll-behavior: smooth;
+}
 body {
     padding: 0;
     margin: 0;
     background-color: #1a1a1a;
     color: #fff;
+    overflow-x: hidden;
 }
 
 /* General */
@@ -183,8 +186,8 @@ body {
 /* Canvas */
 #current_canvas {
     position: fixed;
-    width: 100%;
-    height: 100vh;
+    width: 100vw;
+    height: 100dvh;
     background-color: #303030;
     z-index: -1;
 }
@@ -199,12 +202,15 @@ body {
 .section-container {
     position: relative;
     max-width: 100vw;
-    height: 100vh;
+    height: 100dvh;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow-y: visible;
-    overflow-x: visible;
+
+    background-color: rgba(127, 255, 212, 0.493);
+
+    /* overflow-y: visible;
+    overflow-x: visible; */
 }
 
 
@@ -287,7 +293,7 @@ body {
 }
 
 /* Footer */
-#frame-of-footer {
+#frame6 {
     border: none;
     box-shadow: none;
 }
@@ -298,11 +304,11 @@ body {
     padding: 0px 10px;
 }
 
-#frame-of-footer>.frame-footer {
+#frame6>.frame-footer {
     border: none;
 }
 
-#frame-of-footer>.frame-footer>div {
+#frame6>.frame-footer>div {
     display: flex;
     margin: 0 auto;
     max-width: max-content;
@@ -311,7 +317,7 @@ body {
     padding: 0px;
 }
 
-#frame-of-footer>.frame-footer>div>h3 {
+#frame6>.frame-footer>div>h3 {
     margin: 10px 0px;
 }
 
