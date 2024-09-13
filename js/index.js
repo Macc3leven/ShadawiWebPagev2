@@ -23,13 +23,13 @@ overlayCloseBtn.addEventListener("click", toggleNav);
 // SECTION ANIMATIONS
 const viewportHeight = window.innerHeight;
 const sections = document.querySelectorAll(".section-container");
-let currentSectionIndex = 0; // Keeps track of the currently active section
+let currentSectionIndex = 0, previousSectionIndex = 0; // Keeps track of the currently active section
 
 function animateSection(section, progress) {
   // progress is a value between 0 and 1
   // 0 means fully in view, 1 means fully out of view (either up or down)
   section.style.transform = `translateY(${-progress * 1000}px) scale(1)`;
-  section.style.opacity = 1;
+  section.style.opacity = 1-progress;
 }
 
 function broadcastSectionChange(previousIndex, newIndex) {
@@ -44,10 +44,10 @@ function broadcastSectionChange(previousIndex, newIndex) {
 function handleSectionScroll() {
   let scrollY = window.scrollY;
   let scrollProgress = scrollY / viewportHeight;
-  console.log(scrollProgress)
   const newIndex = Math.floor(scrollProgress);
   if (currentSectionIndex != newIndex) {
     broadcastSectionChange(currentSectionIndex, newIndex);
+    previousSectionIndex = currentSectionIndex;
     currentSectionIndex = newIndex;
   }
 

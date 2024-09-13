@@ -208,7 +208,6 @@ body {
     align-items: center;
 
     background-color: rgba(127, 255, 212, 0.493);
-
     /* overflow-y: visible;
     overflow-x: visible; */
 }
@@ -375,7 +374,7 @@ body {
         flex-direction: column;
     }
 
-    .footer-top>hr {
+    .footer-top > hr {
         width: 90%;
     }
 }
