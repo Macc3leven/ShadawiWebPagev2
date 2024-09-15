@@ -90,8 +90,15 @@ a {
 }
 
 .footer-word-art {
+    font-family: "Apex", sans-serif;
+    font-weight: bold;
     color: white;
     font-size: clamp(2rem, 20vw, 21vw);
+
+    display: inline-block;
+    text-align: center;
+    padding: 0;
+    margin: 0;
 }
 
 .s-letter{

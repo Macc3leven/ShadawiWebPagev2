@@ -1,14 +1,14 @@
 :root {
     --border-color: #fff; /* Define a color variable */
+    --fvh: 100vh;
+    --fvw: 100vw;
 }
 
 .section-frame {
     position: relative;
     box-sizing: border-box;
-    width: calc(100vw - 32px);
-    height: calc(100vh - 16px);
-    /* width: 98vw;
-    height: 98vh; */
+    width: calc(var(--fvw) - 32px);
+    height: calc(var(--fvh)  - 32px);
     border: solid 1px var(--border-color);
     border-radius: 16px;
     text-align: center;

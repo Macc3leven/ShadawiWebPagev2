@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudOgreScene</title>
+</head>
+<style>
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        /* display: flex; */
+        justify-content: center;
+        align-items: center;
+        overflow-x: hidden;
+        /* Prevent scrolling */
+    }
+
+    .info-div {
+        padding: 40px 16px;
+    }
+
+    #canvas-container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        /* Crop any overflow */
+        background-color: brown;
+
+    }
+
+    canvas {
+        /* Keep 16:9 aspect ratio */
+        width: 100%;
+        height: auto;
+        /* aspect-ratio: 16 / 9; */
+        object-fit: cover;
+        /* Crop edges to focus on center */
+    }
+</style>
+
+<body>
+    <div class="info-div">Some information</div>
+    <div class="info-div">Some information</div>
+    <div class="info-div">Some information</div>
+    <div id="canvas-container">
+        <canvas id="mighty"></canvas>
+    </div>
+</body>
+
+<!-- J A V A S C R I P T -->
+<script type="importmap">
+    {
+      "imports": {
+        "three": "https://threejs.org/build/three.module.js",
+        "three/addons/": "https://threejs.org/examples/jsm/"
+      }
+    }
+  </script>
+
+<script type="module">
+    import * as THREE from "three";
+    import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+    const aspect = 16 / 9;
+    let scene, camera, renderer, controls;
+    let canvas;
+    let cube;
+
+    function init() {
+        // Scene
+        scene = new THREE.Scene();
+
+        // Set the camera with 16:9 aspect ratio based on window.innerHeight
+        const height = window.innerHeight;
+        const width = height * aspect; // Set the width based on 16:9 ratio
+
+        // Create the Perspective Camera
+        camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+        camera.position.set(0, 1, 5); // Set the camera position
+
+        // Renderer
+        renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            canvas: document.getElementById('mighty'),
+            alpha: false
+        });
+
+        // Set the renderer size to maintain 16:9 aspect ratio based on height
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        // Add a simple object to the scene (a cube)
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        // allow controls for now
+        controls = new OrbitControls(
+            camera,
+            renderer.domElement
+        );
+        controls.enablePan = true;
+        controls.enableZoom = true;
+        controls.update();
+
+        // Start the animation loop
+        animate();
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+
+        // Rotate the gemPrefab
+        if (cube) {
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+        }
+    }
+
+    // Resize event listener to keep 16:9 ratio on window resize
+    window.addEventListener('resize', () => {
+        const height = window.innerHeight;
+        const width = height * (16 / 9); // Keep the 16:9 ratio based on height
+
+        // Adjust renderer size
+        renderer.setSize(width, height);
+
+        // Update camera aspect ratio
+        camera.aspect = 16 / 9;
+        camera.updateProjectionMatrix();
+    });
+
+
+
+
+    // ----- Build the scene. -----//
+    const modelsStorage = {
+        lightData: [],
+        cloudOgre: "./models/cloudOgreF3.glb",
+        rock: "./models/floatingRock.glb",
+        platform: "./models/landPlatform.glb",
+        planet: "./models/planetWithLights.glb"
+    }
+
+    async function buildScene() {
+
+        // add platform
+        modelsStorage.platform = await addModel(modelsStorage.platform);
+        const platform = modelsStorage.platform.scene;
+
+        // console.log("Look", platform.position, platform.rotation);
+
+        // // make planet
+        // modelsStorage.planet = await addModel(modelsStorage.planet);
+        // console.log(modelsStorage.planet);
+
+        // add lights
+        // extractLightsFromModel(modelsStorage.planet.scene);
+        // console.log(modelsStorage.lightData);
+        // const { lightData } = modelsStorage;
+        // lightData.forEach((light, i) => {
+        //     light.type = "PointLight"
+        //     const newLight = createLight(light);
+        //     lightData[i] = newLight;
+        //     scene.add(newLight);
+        // })
+
+        // console.log(modelsStorage.lightData);
+
+        // cloud ogre 
+        // modelsStorage.cloudOgre = await addModel(modelsStorage.cloudOgre);
+
+        // make camera movements
+
+    } buildScene();
+
+
+    async function addModel(modelPath) {
+        const loader = new GLTFLoader();
+
+        try {
+            // Use loadAsync, which returns a Promise
+            const gltf = await loader.loadAsync(modelPath);
+
+            const model = gltf.scene;
+
+            // Set the position and scale of the model as needed
+            model.position.set(0, 0, 0);
+            model.scale.set(1, 1, 1);
+
+            // Add shadows if desired
+            model.castShadow = true;
+            model.receiveShadow = true;
+
+            // Add the model to the scene
+            scene.add(model);
+
+            return gltf; // Return the loaded model
+        } catch (error) {
+            console.error("Error loading model:", error);
+            throw error; // Rethrow the error for handling higher up
+        }
+    }
+
+    function extractLightsFromModel(model) {
+        model.traverse((child) => {
+            // Check if the child is a light object
+            if (child.isLight) {
+                const lightInfo = {
+                    position: child.position.clone(),   // Clone the position (THREE.Vector3)
+                    rotation: child.rotation.clone(),   // Clone the rotation (THREE.Euler)
+                    type: child.type,
+                    color: `#${child.color.getHexString()}`,  // Store the light type (optional, for debugging)
+                    intensity: child.intensity,
+                    distance: child.distance,
+                    decay: child.decay,
+                };
+
+                // Add the light's position and rotation to the array
+                modelsStorage.lightData.push(lightInfo);
+            }
+        });
+    }
+
+    function createLight(lightDataObject) {
+        const { type, ...params } = lightDataObject;
+
+        switch (type) {
+            case "HemisphereLight":
+                return new THREE.HemisphereLight(
+                    params.colorSky,
+                    params.colorGround,
+                    params.intensity
+                );
+            case "AmbientLight":
+                return new THREE.AmbientLight(params.color, params.intensity);
+            case "DirectionalLight":
+                return new THREE.DirectionalLight(params.color, params.intensity);
+            case "PointLight":
+                return new THREE.PointLight(
+                    params.color,
+                    params.intensity,
+                    params.distance,
+                    params.decay
+                );
+
+            // Add cases for other light types...
+            default:
+                throw new Error(`Invalid light type: ${type}`);
+        }
+    }
+
+    // Initialize the scene
+    init();
+
+</script>
+
+</html>
