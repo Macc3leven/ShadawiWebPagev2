@@ -9,11 +9,12 @@ function setViewportHeight() {
   document.documentElement.style.setProperty('--vh', `${vh}px`);
   document.documentElement.style.setProperty('--fvh', `${vh}px`);
   document.documentElement.style.setProperty('--fvw', `${vw}px`);
+  window.alert("SOME CHANGE")
 }
 
 // Set the height on page load
 // setViewportHeight();
-setTimeout(setViewportHeight, 3000);
+// setTimeout(setViewportHeight, 3000);
 
 
 // Update the height on window resize and orientation change
