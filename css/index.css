@@ -31,8 +31,8 @@ body {
     perspective: 1000px;
 }
 
-.frame-footer>p,
-.frame-footer>div>a {
+.frame-footer > p,
+.frame-footer > div > a {
     font-size: 9px;
     font-weight: lighter;
     letter-spacing: 2px;
@@ -182,8 +182,6 @@ body {
 
 
 
-
-
 /* Canvas */
 #current_canvas {
     position: fixed;
@@ -197,7 +195,7 @@ body {
 /* Sections */
 .section-container-all {
     position: relative;
-    perspective: 1000;
+    /* perspective: 1000; */
 }
 
 .section-container {
@@ -207,8 +205,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    perspective: 1000;
 }
 
+.section-container:nth-child(1){
+    /* background-color: rgb(0, 0, 0); */
+}
 
 /* section1: hero */
 #frame1 .frame-title {
@@ -334,23 +336,24 @@ body {
 .footer-top > div {
     position: relative;
     box-sizing: border-box;
-    padding: 16px 16px;
+    padding: 8px 16px;
     flex: 1;
 }
 
 .footer-info-text-container {
     position: absolute;
     display: flex;
+    flex-wrap: wrap;
     flex-direction: column;
     gap: 10px;
     width: calc(100% - 20px);
     padding: 8px 0;
-    bottom: 0px;
 }
 
 .footer-info-text-container>div>p,
 .footer-info-text-container>a {
     font-size: 12px;
+    flex: 1;
 }
 
 
@@ -366,7 +369,6 @@ body {
     border-bottom: solid 1px black;
     grid-column: 1 / -1;
     grid-row: -5 / -2;
-    background-color: #de6969;
 }
 
 /* Screen */

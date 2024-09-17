@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudOgreScene</title>
+</head>
+<style>
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        /* display: flex; */
+        justify-content: center;
+        align-items: center;
+        overflow-x: hidden;
+        /* Prevent scrolling */
+    }
+
+    .info-div {
+        padding: 40px 16px;
+    }
+
+    #canvas-container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        /* Crop any overflow */
+        background-color: brown;
+
+    }
+
+    canvas {
+        /* Keep 16:9 aspect ratio */
+        width: 100%;
+        height: auto;
+        /* aspect-ratio: 16 / 9; */
+        object-fit: cover;
+        /* Crop edges to focus on center */
+    }
+</style>
+
+<body>
+    <!-- <div class="info-div">Some information</div>
+    <div class="info-div">Some information</div>
+    <div class="info-div">Some information</div> -->
+    <div id="canvas-container">
+        <canvas id="mighty"></canvas>
+    </div>
+</body>
+
+<!-- J A V A S C R I P T -->
+<script type="importmap">
+    {
+      "imports": {
+        "three": "https://threejs.org/build/three.module.js",
+        "three/addons/": "https://threejs.org/examples/jsm/"
+      }
+    }
+  </script>
+
+<script type="module">
+    import * as THREE from "three";
+    import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+    const aspect = 16 / 9;
+    let particleGeometry = new THREE.BufferGeometry();
+    let scene, camera, renderer, controls;
+    let canvas;
+    let cube;
+    let time = 0, wobble = false;//, stars = false;
+
+    function init() {
+        // Scene
+        scene = new THREE.Scene();
+
+        // Set the camera with 16:9 aspect ratio based on window.innerHeight
+        const wide = (window.innerHeight < window.innerWidth);
+        const height = wide ? window.innerWidth / aspect : window.innerHeight;
+        const width = wide ? window.innerWidth : height * aspect;
+        console.log({ height, width })
+
+        // Create the Perspective Camera
+        camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 500);
+        camera.position.set(0, 1, 5); // Set the camera position
+
+        // Renderer
+        renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            canvas: document.getElementById('mighty'),
+            alpha: false
+        });
+
+        // Set the renderer size to maintain 16:9 aspect ratio based on height
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        // Add a simple object to the scene (a cube)
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        // allow controls for now
+        controls = new OrbitControls(
+            camera,
+            renderer.domElement
+        );
+        controls.enablePan = true;
+        controls.enableZoom = true;
+        controls.update();
+
+        // Start the animation loop
+        animate();
+
+        // start the scene
+        buildScene();
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+
+        // wobble camera
+        if (wobble) cameraWobble();
+        // if (stars) moveParicles();
+
+    }
+
+    // Resize event listener to keep 16:9 ratio on window resize
+    window.addEventListener('resize', () => {
+        const wide = (window.innerHeight < window.innerWidth);
+        const height = wide ? window.innerWidth / aspect : window.innerHeight;
+        const width = wide ? window.innerWidth : height * aspect;
+        console.log({ height, width })
+
+        // Adjust renderer size
+        renderer.setSize(width, height);
+
+        // Update camera aspect ratio
+        camera.aspect = 16 / 9;
+        camera.updateProjectionMatrix();
+    });
+
+
+
+
+    // ----- Build the scene. -----//
+    const modelsStorage = {
+        lightData: [],
+        cloudOgre: "./models/cloudOgreF3.glb",
+        rock: "./models/floatingRock.glb",
+        platform: "./models/landPlatform.glb",
+        planet: "./models/planet01.glb"
+    }
+
+    function cameraWobble() {
+        // Increment time to create continuous movement
+        time += 0.01;
+        const horzAmp = 0.0002;
+        const vertAmp = 0.00014;
+        const rotaionAmp = 0.008;
+
+        // Wobble the camera's position
+        camera.position.x = camera.position.x + Math.sin(time) * horzAmp;  // Small horizontal wobble
+        camera.position.y = camera.position.y + Math.sin(time * 1.5) * vertAmp;  // Small vertical wobble
+
+        // Wobble the camera's rotation
+        camera.rotation.x = Math.sin(time * 0.5) * rotaionAmp;  // Small pitch wobble
+        camera.rotation.z = Math.sin(time) * rotaionAmp;        // Small roll wobble
+    }
+
+    function moveObject(object, startPosition, endPosition, steps = 100, callback) {
+        let currentStep = 0;
+
+        function animateMove() {
+            if (currentStep < steps) {
+                let t = currentStep / steps;  // Normalize progress (0 to 1)
+
+                // Interpolate the object's position
+                object.position.lerpVectors(startPosition, endPosition, t);
+
+                currentStep++;
+
+                // Request the next frame for smooth movement
+                requestAnimationFrame(animateMove);
+            } else if (callback) {
+                // If provided, call the callback when movement is done
+                callback();
+            }
+        }
+
+        // Start the movement
+        animateMove();
+    }
+
+    async function buildScene() {
+
+        // camera
+        // let camPos1 = new THREE.Vector3(-40, 6.55, 0);  // Starting position
+        // let camPos2 = new THREE.Vector3(-39.4, 6.25, 0);  // Target position
+        // moveObject(camera, camPos1, camPos2, 100, () => wobble = true)
+        // camera.position.set(-40, 6.55, 0);
+        camera.position.set(-39.4, 6.25, -0.05);
+        wobble = true;
+        // camera.rotation.set(-2.456421778287911, -1.342947158470165, -2.469217513389192);
+        camera.position.z = 0
+        camera.lookAt(0, 0, 0);
+
+        // particles
+        beginParticles()
+
+        // Add fog to the scene
+        const fogColor = "#de6969"; // Light gray fog
+        const near = 90; // Start fading at distance 10 units away from the camera
+        const far = 500; // Fully fogged at distance 100 units away from the camera
+        scene.fog = new THREE.Fog(fogColor, near, far);
+
+
+        // add platform
+        modelsStorage.platform = await addModel(modelsStorage.platform);
+        const platform = modelsStorage.platform.scene;
+        outputDetails("platform", platform);
+
+        // make planet
+        let planetModel = null;
+        let planetModelPos = { x: 293.0623474121094, y: 129.6905975341797, z: 0 };
+        modelsStorage.planet = await addModel(modelsStorage.planet);
+        modelsStorage.planet.scene.traverse((child) => {
+            if (child.name == "Sphere003") {
+                planetModel = child;
+                console.log("SPERE03:", child.position)
+
+
+                // get size 
+                outputDetails("planet", child);
+
+
+
+                // ----- movement
+                // const doit = () => {
+                //     child.position.x -= .5;
+                //     setTimeout(doit, 100)
+                // };
+
+                // doit();
+
+
+            }
+        })
+
+        // add lights
+        const lightsArray = [
+            {
+                type: "HemisphereLight",
+                colorSky: 0x404040,  // Dim sky light for overall atmosphere
+                colorGround: "#5C2D2D",  // Dark ground to mimic outer space
+                intensity: 0.5,  // Very subtle fill light for the entire scene
+            },
+            {
+                type: "PointLight",
+                color: 0xffcc66,  // Warm yellow light
+                intensity: 0.8,  // Medium-intensity point light
+                position: { x: 300, y: 200, z: 50 },  // Positioned above and slightly to the side of the terrain
+                distance: 800,  // Large distance for a smooth falloff
+                decay: 2,  // Natural decay of the light
+                castShadow: true  // Enable shadows for added depth
+            },
+            {
+                type: "PointLight",
+                color: 0x7777ff,  // Cool blue light
+                intensity: 0.6,  // Lower intensity to create a contrast
+                position: { x: 500, y: 150, z: -200 },  // Positioned to the side of the planet, casting light on the terrain edges
+                distance: 700,  // Medium distance to give some light to the terrain
+                decay: 2,  // Smooth decay as it falls off the terrain
+            },
+            {
+                type: "DirectionalLight",
+                color: "#DCDCDC",  // White light to simulate sunlight
+                intensity: 0.1855,  // Not too bright, as the moon has weak lighting
+                position: { x: -10, y: 20, z: 10 },  // Light coming from above and behind the character
+                shadow: {
+                    mapSize: { width: 2048, height: 2048 },  // High-quality shadows
+                    camera: {
+                        near: 0.5,
+                        far: 100,
+                        left: -50,
+                        right: 50,
+                        top: 50,
+                        bottom: -50
+                    }
+                }
+            },
+            {
+                type: "PointLight",
+                color: 0x77aaff,  // Cool blue light to mimic the moon's reflected light
+                intensity: 5,  // Subtle light from below the character
+                position: { x: -38, y: 4.5, z: 0 },  // Light coming from below and slightly in front of the character
+                distance: 50,  // Limited range to just highlight the character
+                decay: 2,  // Smooth falloff
+                castShadow: true
+            },
+            {
+                type: "PointLight",
+                color: 0xffcc66,  // Warm light for rim lighting the character from behind
+                intensity: 1,  // More intense rim light to define the character’s outline
+                position: { x: -45, y: 4.5, z: 5 },  // Positioned behind and above the character
+                distance: 60,  // Enough range to create a subtle halo around the character
+                decay: 2,  // Smooth light decay
+            },
+            {
+                type: "AmbientLight",
+                color: 0x404040,  // Very soft ambient light to ensure the scene is not completely dark
+                intensity: 0.2,  // Just enough to fill the darkest areas
+            }
+        ];
+
+        lightsArray.forEach(light => {
+            const newLight = createLight(light);
+            modelsStorage.lightData.push(newLight);
+            scene.add(newLight);
+        });
+
+        // cloud ogre 
+        modelsStorage.cloudOgre = await addModel(modelsStorage.cloudOgre);
+        modelsStorage.cloudOgre.scene.position.x = -38
+        modelsStorage.cloudOgre.scene.position.y = 4.2
+        outputDetails("cloudOgre", modelsStorage.cloudOgre.scene);
+
+        // make camera movements
+    }
+
+    function createBox(size_x, size_y, size_z) {
+        const geometry = new THREE.BoxGeometry(size_x, size_y, size_z); // Width: 1, Height: 2, Depth: 3
+        const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const mesh = new THREE.Mesh(geometry, material);
+
+        // Add the mesh to the scene
+        scene.add(mesh);
+        return mesh;
+    }
+
+    function outputDetails(name, object) {
+
+        // Get the size of the bounding box (in world units)
+        const boundingBox = new THREE.Box3().setFromObject(object);
+        let size = new THREE.Vector3();
+        size = boundingBox.getSize(size);
+
+        const result = { size, position: object.position };
+        console.log(name + ":\n", result);
+    }
+
+    async function addModel(modelPath) {
+        const loader = new GLTFLoader();
+
+        try {
+            // Use loadAsync, which returns a Promise
+            const gltf = await loader.loadAsync(modelPath);
+
+            const model = gltf.scene;
+
+            // Set the position and scale of the model as needed
+            model.position.set(0, 0, 0);
+            model.scale.set(1, 1, 1);
+
+            // Add shadows if desired
+            model.castShadow = true;
+            model.receiveShadow = true;
+
+            // Add the model to the scene
+            scene.add(model);
+
+            return gltf; // Return the loaded model
+        } catch (error) {
+            console.error("Error loading model:", error);
+            throw error; // Rethrow the error for handling higher up
+        }
+    }
+
+    function createLight(lightDataObject) {
+        const { type, ...params } = lightDataObject;
+
+        switch (type) {
+            case "HemisphereLight":
+                return new THREE.HemisphereLight(
+                    params.colorSky,
+                    params.colorGround,
+                    params.intensity
+                );
+            case "AmbientLight":
+                return new THREE.AmbientLight(params.color, params.intensity);
+            case "DirectionalLight":
+                return new THREE.DirectionalLight(params.color, params.intensity);
+            case "PointLight":
+                return new THREE.PointLight(
+                    params.color,
+                    params.intensity,
+                    params.distance,
+                    params.decay
+                );
+
+            // Add cases for other light types...
+            default:
+                throw new Error(`Invalid light type: ${type}`);
+        }
+    }
+
+
+
+
+
+    // Particles
+    function rand(low, high) {
+        return Math.random() * (high - low) + low;
+    }
+
+    function beginParticles() {
+
+
+        let particleCount = 100;
+        let posArray = new Float32Array(particleCount * 3);
+        for (let i = 0; i < particleCount * 3; i += 3) {
+            // Spread the stars out along the x and y axes
+            posArray[i] = rand(300, 499);  // x-axis, wider area
+            posArray[i + 1] = rand(-1, 299);  // y-axis, wider area
+
+            // Set z-axis so stars are behind the planet (e.g., -200 to -500 units behind)
+            posArray[i + 2] = rand(-499, 499);  // z-axis, push stars far back
+        }
+        particleGeometry.setAttribute(
+            "position",
+            new THREE.BufferAttribute(posArray, 3)
+        );
+        let particleMaterial = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 1,
+        });
+        let particleMesh = new THREE.Points(particleGeometry, particleMaterial);
+        scene.add(particleMesh);
+
+    }
+
+    function moveParicles() { // will be used in animate function
+        particleGeometry.attributes.position.needsUpdate = true; // Update particles
+        // Add some movement to each particle to simulate snow falling
+        let positions = particleGeometry.attributes.position.array;
+        for (let i = 0; i < positions.length; i += 3) {
+            positions[i + 1] -= 0.005; // Move particles down
+            if (positions[i + 1] < -2.5) {
+                positions[i + 1] = 2.5;
+            }
+        }
+    }
+
+
+
+    // Initialize the scene
+    init();
+
+</script>
+
+</html>

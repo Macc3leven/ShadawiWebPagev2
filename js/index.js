@@ -9,12 +9,24 @@ function setViewportHeight() {
   document.documentElement.style.setProperty('--vh', `${vh}px`);
   document.documentElement.style.setProperty('--fvh', `${vh}px`);
   document.documentElement.style.setProperty('--fvw', `${vw}px`);
-  window.alert("SOME CHANGE")
 }
 
+function indicateChange(){
+  const el = document.getElementById("navbar");
+  const color = el.style.backgroundColor;
+  console.log({color});
+  if(color === "rgb(222, 105, 105)"){
+    el.style.backgroundColor = "#1a1a1a"
+    el.innerText = "WOOOP"
+  } else el.style.backgroundColor = "#de6969"
+
+  setTimeout(indicateChange, 3000);
+}
+
+
+
 // Set the height on page load
-// setViewportHeight();
-// setTimeout(setViewportHeight, 3000);
+setViewportHeight();
 
 
 // Update the height on window resize and orientation change
@@ -45,13 +57,13 @@ overlayCloseBtn.addEventListener("click", toggleNav);
 
 // SECTION ANIMATIONS
 const viewportHeight = window.innerHeight;
-const sections = document.querySelectorAll(".section-container");
+const sections = document.querySelectorAll(".section-frame");
 let currentSectionIndex = 0; // Keeps track of the currently active section
 
 function animateSection(section, progress) {
   // progress is a value between 0 and 1
   // 0 means fully in view, 1 means fully out of view (either up or down)
-  section.style.transform = `translateY(${-progress * 1000}px) scale(1)`;
+  section.style.transform = `translateY(${-progress * 1000}px) scale(${1-progress})`// rotate(${ progress * 90 }deg)`;
   section.style.opacity = 1-progress;
 }
 
